@@ -1,8 +1,7 @@
-# Çin Daması – Minimax (.NET Console)
+# Çin Daması - Minimax Algoritması (.NET Console)
 
-Basit bir Çin daması oyunu. İnsan, bilgisayara karşı oynar. Bilgisayar hamlelerini
-**Minimax** algoritmasıyla seçer, rastgele oynamaz. Amaç profesyonel bir oyun değil;
-oyun kurallarını modelleyip bir algoritmanın karar vermesini göstermektir.
+Konsolda oynanan Çin Daması Oyunu. İnsan, bilgisayara karşı oynar; bilgisayar hamlelerini
+**Minimax** algoritmasıyla seçer (rastgele değil).
 
 ## Çalıştırma
 
@@ -12,118 +11,47 @@ dotnet run
 
 .NET 8 SDK gerekir.
 
-## Oyun kuralları
+## Kurallar
 
-Basit tutmak için tahta küçültülmüştür:
+- Tahta **5x5**, her oyuncunun **3 taşı** var.
+- **İnsan (H):** sol-üstten başlar, hedefi sağ-alt köşe.
+- **Bilgisayar (C):** sağ-alttan başlar, hedefi sol-üst köşe.
+- Taşlar 8 yöne **kayabilir** (boş komşuya) veya **zıplayabilir** (bir taşın üzerinden
+  boş kareye). Zıplamalar art arda **zincirlenebilir**.
+- Geçersiz hamleler (tahta dışı, dolu kareye gitme, kural dışı atlama) engellenir;
+  hatalı girişte geçerli hamle listesi gösterilir.
+- Tüm taşlarını hedef köşeye taşıyan kazanır.
 
-- Tahta **5x5** karedir.
-- Her oyuncunun **3 taşı** vardır.
-- **İnsan (H)** sol-üst köşeden başlar: `(0,0) (0,1) (1,0)`. Hedefi **sağ-alt** köşedir.
-- **Bilgisayar (C)** sağ-alt köşeden başlar: `(4,4) (4,3) (3,4)`. Hedefi **sol-üst** köşedir.
-- Oyuncular **sırayla** oynar.
-- Taşlar 8 yöne (yatay, dikey, çapraz) hareket eder:
-  - **Kayma:** boş bir komşu kareye geçiş.
-  - **Zıplama:** hemen yanındaki bir taşın üzerinden, arkasındaki boş kareye atlama.
-  - **Zincirleme zıplama:** iniş sonrası yeni zıplama mümkünse tek hamlede zincirlenir.
-- **Geçersiz hamleler** engellenir: tahta dışına çıkış, dolu kareye gidiş, taşı olmayan
-  kareyi oynama veya kurallara uymayan atlama kabul edilmez. İnsan geçersiz hamle
-  girerse geçerli hamle listesi gösterilir.
-- Tüm taşlarını karşı hedef köşeye yerleştiren oyuncu **kazanır**.
-
-## Hamle girişi
-
-```
-satır sütun satır sütun
-```
-
-Örnek: `4 4 3 3` → `(4,4)` taşını `(3,3)` karesine oynar.
+**Hamle girişi:** `satır sütun satır sütun` → örnek: `4 4 3 3`
 
 ## Minimax nedir?
 
-Minimax, iki oyunculu sıralı oyunlarda karar verme algoritmasıdır. Mantığı:
+Bilgisayar olası hamlelerini hesaplar, her birine karşı rakibin en iyi cevabını
+düşünür, bunu birkaç hamle ileriye (**derinlik 4**) kadar tekrarlar. Bilgisayar
+puanı **büyütmeye**, insan **küçültmeye** çalışıyormuş gibi varsayılır. Ağacın dibi
+skor fonksiyonuyla puanlanır, puanlar yukarı taşınır, kökte en iyi hamle seçilir.
+Hız için **alfa-beta budama** kullanılır.
 
-1. Bilgisayar yapabileceği tüm hamleleri hesaplar.
-2. Her hamle sonrası rakibin (insanın) verebileceği en iyi cevabı düşünür.
-3. Rakibin cevabından sonra kendi en iyi hamlesini... diye belirli bir **derinliğe**
-   kadar ağacı kurar.
-4. Bilgisayar kendi puanını **büyütmeye** (maximizing), rakibin ise **küçültmeye**
-   (minimizing) çalıştığını varsayar.
-5. Ağacın dibindeki tahtalar bir **skor fonksiyonu** ile puanlanır, bu puanlar yukarı taşınır ve kökte en iyi hamle seçilir.
+## Skor mantığı
 
-Bu projede derinlik `4`'tür (`Program.cs` içinde `SearchDepth`). Performans için
-**alfa-beta budama** eklenmiştir: sonucu değiştirmeyeceği kesinleşen dalların
-aranması durdurulur.
+- Bilgisayar taşı hedefe yaklaştıkça **+puan** (Manhattan uzaklığı ile), hedefe
+  girerse **+10** bonus.
+- İnsan taşı kendi hedefine yaklaştıkça bilgisayar için **-puan**, girerse **-10**.
+- Kazanan taraf için **±1000**.
 
-## Skor mantığı (Evaluate)
+`Ai.ChooseBestMove`, tüm bilgisayar hamlelerini dener, her birini Minimax ile puanlar
+ve **en yüksek skorlu** hamleyi seçer.
 
-Skor bilgisayar açısından hesaplanır (yüksek = bilgisayar için iyi):
+## Örnek
 
-- Her **bilgisayar** taşı hedefe (sol-üst) yaklaştıkça **artı** puan
-  (Manhattan uzaklığı kullanılır).
-- Hedef köşedeki her bilgisayar taşı için **+10** bonus.
-- Her **insan** taşı kendi hedefine yaklaştıkça bilgisayar için **eksi** puan.
-- Hedefe girmiş insan taşı için **-10**.
-- Bilgisayar oyunu kazanırsa **+1000**, insan kazanırsa **-1000**.
-
-## Bilgisayar hamleyi nasıl seçer?
-
-`Ai.ChooseBestMove` tüm bilgisayar hamlelerini üretir, her birini uygular ve ortaya
-çıkan tahtayı `Minimax` ile puanlar. **En yüksek** skorlu hamle seçilir.
-
-## Örnek oyun durumları
-
-### Örnek A — Başlangıç konumu
-
-Başlangıç tahtası:
-
-```
-    0 1 2 3 4
- 0  H H . . .
- 1  H . . . .
- 2  . . . . .
- 3  . . . . C
- 4  . . . C C
-```
-
-Bilgisayar açılışta değerlendirdiği hamlelerden bazıları (derinlik 3, gerçek çıktı):
-
-```
-(4,4)->(4,2)  skor -1
-(4,4)->(3,3)  skor -1
-(4,4)->(2,4)  skor -1
-(4,3)->(3,2)  skor -1
-(3,4)->(2,3)  skor -1
-```
-
-Açılışta taşlar birbirine simetrik uzaklıkta olduğundan skorlar yakındır; bilgisayar
-hedefe (sol-üst) doğru ilerleyen, uzaklığı azaltan bir hamleyi seçer — örneğin
-`(3,4)->(2,3)`, uzaklığı `6`'dan `4`'e düşürür.
-
-**Neden?** Skor fonksiyonu hedefe yaklaşan taşa artı puan verdiği için, geriye veya
-yana giden hamleler yerine sol-üste doğru ilerleyen hamle daha yüksek puan alır.
-
-### Örnek B — Zıplama fırsatı
-
-Yapay bir durumda bilgisayarın `(3,4)` taşının önünde bir insan taşı `(2,3)` var:
-
-```
-    0 1 2 3 4
- 0  . . . . .
- 1  . . . . .
- 2  . . . H .
- 3  . . . . C
- 4  . . . C C
-```
-
-Bilgisayarın seçtiği hamle (gerçek çıktı):
+Bilgisayarın `(3,4)` taşı önünde insan taşı `(2,3)` varken:
 
 ```
 (3,4)->(1,2)  skor 3
 ```
 
-**Neden?** Kayma tek kare ilerletirken, insan taşının üzerinden **zıplama** taşı iki
-kare birden hedefe (sol-üste) yaklaştırır. Uzaklık daha çok azaldığı için skor daha
-yüksektir ve Minimax bu hamleyi seçer.
+**Neden?** Kayma tek kare ilerletirken, zıplama iki kare birden hedefe yaklaştırır;
+uzaklık daha çok azaldığı için skor daha yüksektir.
 
 ## Dosya yapısı
 
