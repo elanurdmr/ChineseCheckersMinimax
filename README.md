@@ -1,4 +1,4 @@
-# Çin Daması - Minimax Algoritması (.NET Console)
+# Çin Daması - Minimax (.NET Console)
 
 Konsolda oynanan Çin Daması Oyunu. İnsan, bilgisayara karşı oynar; bilgisayar hamlelerini
 **Minimax** algoritmasıyla seçer (rastgele değil).
@@ -32,6 +32,11 @@ puanı **büyütmeye**, insan **küçültmeye** çalışıyormuş gibi varsayıl
 skor fonksiyonuyla puanlanır, puanlar yukarı taşınır, kökte en iyi hamle seçilir.
 Hız için **alfa-beta budama** kullanılır.
 
+
+## Alfa-Beta Budama nedir?
+
+Minimaxın gereksiz yere her dalı sonuna kadar aramasını engeller. alpha bilgisayarın, beta insanın o ana kadar bulduğu en iyi skordur. beta <= alpha olduğunda rakip zaten daha iyi bir seçeneğe sahip demektir, o yüzden kalan hamleler atlanır. Sonucu değiştirmez, sadece daha hızlı bulunmasını sağlar.
+
 ## Skor mantığı
 
 - Bilgisayar taşı hedefe yaklaştıkça **+puan** (Manhattan uzaklığı ile), hedefe
@@ -42,16 +47,43 @@ Hız için **alfa-beta budama** kullanılır.
 `Ai.ChooseBestMove`, tüm bilgisayar hamlelerini dener, her birini Minimax ile puanlar
 ve **en yüksek skorlu** hamleyi seçer.
 
-## Örnek
+## Örnek oyun durumları
 
-Bilgisayarın `(3,4)` taşı önünde insan taşı `(2,3)` varken:
+### Örnek 1 - Açılış hamlesi
+
+Başlangıç tahtasında bilgisayarın değerlendirdiği hamlelerden biri:
+
+```
+(3,4)->(2,3)  skor -1
+```
+
+**Neden?** Bu hamle bilgisayarın hedefine (sol-üst köşe) olan uzaklığını `6`'dan
+`4`'e düşürür. Diğer hamleler ya uzaklığı değiştirmiyor ya da artırıyor, bu yüzden
+hedefe yaklaşan bu hamle daha yüksek skor alıyor.
+
+### Örnek 2 - Zıplama fırsatı
+
+Bilgisayarın `(3,4)` taşı önünde bir insan taşı `(2,3)` varken:
 
 ```
 (3,4)->(1,2)  skor 3
 ```
 
-**Neden?** Kayma tek kare ilerletirken, zıplama iki kare birden hedefe yaklaştırır;
-uzaklık daha çok azaldığı için skor daha yüksektir.
+**Neden?** Kayma tek kare ilerletirken, insan taşının üzerinden zıplama iki kare
+birden hedefe yaklaştırır. Uzaklık daha çok azaldığı için skor daha yüksektir ve
+Minimax bu hamleyi seçer.
+
+### Örnek 3 - Kazanan hamle
+
+Bilgisayarın son taşı hedef köşenin bir adım yanındaysa ve oraya gidebiliyorsa:
+
+```
+(1,0)->(0,0)  skor 1000
+```
+
+**Neden?** Bu hamle bilgisayarın tüm taşlarını hedefe ulaştırıp oyunu kazandırır.
+`Evaluate` fonksiyonu kazanma durumuna `+1000` verdiği için bu hamle her zaman
+diğer tüm hamlelerden daha yüksek skor alır ve kesin olarak seçilir.
 
 ## Dosya yapısı
 
