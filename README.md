@@ -32,7 +32,6 @@ puanı **büyütmeye**, insan **küçültmeye** çalışıyormuş gibi varsayıl
 skor fonksiyonuyla puanlanır, puanlar yukarı taşınır, kökte en iyi hamle seçilir.
 Hız için **alfa-beta budama** kullanılır.
 
-
 ## Alfa-Beta Budama nedir?
 
 Minimaxın gereksiz yere her dalı sonuna kadar aramasını engeller. alpha bilgisayarın, beta insanın o ana kadar bulduğu en iyi skordur. beta <= alpha olduğunda rakip zaten daha iyi bir seçeneğe sahip demektir, o yüzden kalan hamleler atlanır. Sonucu değiştirmez, sadece daha hızlı bulunmasını sağlar.
@@ -51,7 +50,14 @@ ve **en yüksek skorlu** hamleyi seçer.
 
 ### Örnek 1 - Açılış hamlesi
 
-Başlangıç tahtasında bilgisayarın değerlendirdiği hamlelerden biri:
+```
+    0 1 2 3 4
+ 0  H H . . .
+ 1  H . . . .
+ 2  . . . . .
+ 3  . . . . C
+ 4  . . . C C
+```
 
 ```
 (3,4)->(2,3)  skor -1
@@ -62,6 +68,15 @@ Başlangıç tahtasında bilgisayarın değerlendirdiği hamlelerden biri:
 hedefe yaklaşan bu hamle daha yüksek skor alıyor.
 
 ### Örnek 2 - Zıplama fırsatı
+
+```
+    0 1 2 3 4
+ 0  . . . . .
+ 1  . . . . .
+ 2  . . . H .
+ 3  . . . . C
+ 4  . . . C C
+```
 
 Bilgisayarın `(3,4)` taşı önünde bir insan taşı `(2,3)` varken:
 
@@ -75,15 +90,25 @@ Minimax bu hamleyi seçer.
 
 ### Örnek 3 - Kazanan hamle
 
+```
+    0 1 2 3 4
+ 0  . C . . .
+ 1  C C . . .
+ 2  . . . . .
+ 3  . . . . .
+ 4  . . . . .
+```
+
 Bilgisayarın son taşı hedef köşenin bir adım yanındaysa ve oraya gidebiliyorsa:
 
 ```
-(1,0)->(0,0)  skor 1000
+(1,1)->(0,0)  skor 1000
 ```
 
-**Neden?** Bu hamle bilgisayarın tüm taşlarını hedefe ulaştırıp oyunu kazandırır.
-`Evaluate` fonksiyonu kazanma durumuna `+1000` verdiği için bu hamle her zaman
-diğer tüm hamlelerden daha yüksek skor alır ve kesin olarak seçilir.
+**Neden?** Bu hamle bilgisayarın üç taşını da hedef köşeye `(0,0),(0,1),(1,0)`
+tamamlar ve oyunu kazandırır. `Evaluate` fonksiyonu kazanma durumuna `+1000` verdiği
+için bu hamle her zaman diğer tüm hamlelerden daha yüksek skor alır ve kesin olarak
+seçilir.
 
 ## Dosya yapısı
 
