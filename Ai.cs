@@ -2,16 +2,16 @@ namespace ChineseCheckersMinimax;
 
 public static class Ai
 {
-    // Bilgisayar açısından tahtayı puanlar.
-    // Yüksek puan = Bilgisayar için iyi, düşük = İnsan için iyi.
-    public static int Evaluate(Board b)
+    // Verilen oyuncu perspektifinden tahtayı puanlar.
+    // perspective = Player.Computer (varsayılan): yüksek puan Bilgisayar için iyi.
+    // perspective = Player.Human: yüksek puan İnsan için iyi (skoru çevirir).
+    // Varsayılan parametre sayesinde mevcut Minimax kodu değişmeden çalışır.
+    public static int Evaluate(Board b, Player perspective = Player.Computer)
     {
         int score = 0;
 
-        // Bilgisayar hedefi sol-üst köşe: (0,0) yakını iyi.
-        // Her Bilgisayar taşı için hedefe olan uzaklığı DÜŞÜK olması iyi,
-        // bu yüzden (maxUzaklık - uzaklık) ekliyoruz.
-        // İnsan hedefi sağ-alt köşe: onun ilerlemesi bizim için kötü.
+        // Bilgisayar hedefi sol-üst köşe, İnsan hedefi sağ-alt köşe.
+        // Her taşın hedefe olan Manhattan uzaklığı düşükse puan yükselir.
         int maxDist = (Board.Size - 1) * 2;
 
         for (int r = 0; r < Board.Size; r++)
@@ -37,7 +37,8 @@ public static class Ai
         if (b.HasWon(Player.Computer)) score += 1000;
         if (b.HasWon(Player.Human)) score -= 1000;
 
-        return score;
+        // İnsan perspektifinden sorulursa skoru çevir: yüksek = İnsan için iyi.
+        return perspective == Player.Computer ? score : -score;
     }
 
     private static int ClosestDist(int r, int c, (int r, int c)[] targets)
@@ -58,13 +59,12 @@ public static class Ai
         return false;
     }
 
-    // Minimax + alfa-beta budama.
-    // maximizing = true iken Bilgisayar (puanı büyütmek ister),
-    // false iken İnsan (puanı küçültmek ister) modellenir.
+    // Minimax + alfa-beta budama. Her zaman Bilgisayar perspektifinden değerlendirir
+    // (maximizing=true → Bilgisayar oynuyor; false → İnsan oynuyor).
     public static int Minimax(Board b, int depth, bool maximizing, int alpha, int beta)
     {
         if (depth == 0 || b.HasWon(Player.Computer) || b.HasWon(Player.Human))
-            return Evaluate(b);
+            return Evaluate(b); // perspektif belirtilmez → varsayılan = Computer
 
         Player p = maximizing ? Player.Computer : Player.Human;
         var moves = b.GenerateMoves(p);
