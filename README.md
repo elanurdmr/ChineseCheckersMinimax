@@ -110,8 +110,45 @@ tamamlar ve oyunu kazandırır. `Evaluate` fonksiyonu kazanma durumuna `+1000` v
 için bu hamle her zaman diğer tüm hamlelerden daha yüksek skor alır ve kesin olarak
 seçilir.
 
+## Genetik Algoritma
+
+`dotnet run` başladığında **Mod 2** seçilerek Minimax'e karşı otomatik maç oynatılabilir.
+Genetik Algoritma (GA) **İnsan (H)** rolünü, Minimax **Bilgisayar (C)** rolünü üstlenir.
+
+### Nasıl Çalışır?
+
+- **Kromozom:** Oyuncunun 3 hamlelik ardışık planı.
+- **Fitness:** Plan uygulandıktan sonraki tahtanın `Evaluate(board, Player.Human)` skoru.
+- **Başlatma:** 20 rastgele geçerli plan oluşturulur.
+- **Seçim:** Turnuva seçimi (3 birey yarışır, en iyisi kazanır).
+- **Çaprazlama:** Tek noktalı; bir ebeveynin başı + diğerinin sonu birleştirilir.
+- **Mutasyon (olasılık 0.35):** Rastgele bir noktadan sonrası yeniden rastgele üretilir.
+  Bu, çaprazlamayla bozulmuş geçersiz hamleleri de onarır.
+- **Elitizm:** En iyi birey bir sonraki nesle doğrudan geçer.
+- 15 nesil evrimleşir; son nesildeki en iyi planın **sadece ilk hamlesi** gerçek oyunda oynanır.
+
+### Minimax'ten Farkı
+
+| | Minimax | Genetik Algoritma |
+|---|---|---|
+| Rakibin hamlelerini hesaba katar mı? | **Evet** | **Hayır** |
+| Arama yöntemi | Oyun ağacı (tam, alfa-beta budamalı) | Evrimsel (sezgisel) |
+| Optimal hamleyi garantiler mi? | Derinlik dahilinde **evet** | **Hayır** |
+
+GA'nın temel zayıflığı: yalnızca **kendi hamlelerini simüle eder**, rakibin ne oynayacağını
+düşünmez. Bu yüzden rakibinin en iyi cevabını planlayan Minimax'e karşı dezavantajlıdır.
+
+### Gerçek Maç Sonucu
+
+**KAZANAN: Minimax (C) — 54 hamlede**
+
+Minimax, taşlarını köşeye sistematik biçimde taşırken GA kısmen ilerledi ama
+rakibin pozisyonunu hesaba katmadığı için birden fazla kez geri adım attı.
+Minimax'in son hamlesiyle üçüncü taşı da `(0,0)-(0,1)-(1,0)` hedef köşesine girdi.
+
 ## Dosya yapısı
 
-- `Program.cs` – oyun döngüsü, insan girişi, sıra yönetimi.
+- `Program.cs` – mod seçimi, oyun döngüsü (insan girişi / otomatik maç).
 - `Game.cs` – `Board`, `Move`, `Player`; hamle üretimi, zıplama/zincir, kazanma, çizim.
-- `Ai.cs` – `Evaluate` skor fonksiyonu ve alfa-beta budamalı `Minimax`.
+- `Ai.cs` – `Evaluate` (perspektif parametreli) ve alfa-beta budamalı `Minimax`.
+- `GeneticAi.cs` – Genetik Algoritma tabanlı hamle seçici.
